@@ -48,7 +48,7 @@ Activates caveman mode inside claude.ai chat. Three intensity levels. Slashes ou
 
 ### Step 1 — Download the skill
 
-Download [`caveman-skill.zip`](https://github.com/3idhMind/caveman-skill/releases/download/v1.0.0/caveman-skill.skill) from Releases.
+Download [`caveman-skill.zip`](https://github.com/devvaham/caveman-skill/releases/download/v1.0.0/caveman-skill.skill) from Releases.
 
 ### Step 2 — Upload to claude.ai
 
@@ -128,7 +128,7 @@ Inspired by [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) �
 
 This repo fills the gap: **claude.ai and Claude Desktop** users who want the same power without touching a terminal.
 
-Built by [@Dev Vaham](https://github.com/3idhMind) / [3idhmid](https://3idhmind.in)
+Built by [@Dev Vaham](https://github.com/devvaham)
 
 ---
 

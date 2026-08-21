@@ -1,837 +1,986 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🪨 caveman-skill — claude.ai edition</title>
-<meta name="description" content="The only caveman skill built for claude.ai. Three modes. Up to 87% token reduction. No terminal required.">
-<meta property="og:title" content="🪨 caveman-skill for claude.ai">
-<meta property="og:description" content="why use many word when few word do trick. Now for claude.ai web & desktop.">
-<meta property="og:image" content="og.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=VT323&display=swap" rel="stylesheet">
-
-<style>
-  :root {
-    --stone: #1a1612;
-    --cave: #0f0d0b;
-    --rock: #2d2520;
-    --ember: #c4622d;
-    --fire: #e8873a;
-    --ash: #8a7d72;
-    --bone: #d4c5b0;
-    --chalk: #f0e8dc;
-    --moss: #4a5c3a;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--cave);
-    color: var(--bone);
-    font-family: 'Space Mono', monospace;
-    overflow-x: hidden;
-    cursor: default;
-  }
-
-  /* Grain overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
-  }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 2rem;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 60% 40% at 50% 80%, rgba(196,98,45,0.15) 0%, transparent 70%),
-      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196,98,45,0.08) 0%, transparent 60%);
-  }
-
-  /* Cave wall texture stripes */
-  .cave-wall {
-    position: absolute;
-    inset: 0;
-    background-image: 
-      repeating-linear-gradient(
-        92deg,
-        transparent,
-        transparent 80px,
-        rgba(255,255,255,0.008) 80px,
-        rgba(255,255,255,0.008) 81px
-      ),
-      repeating-linear-gradient(
-        178deg,
-        transparent,
-        transparent 120px,
-        rgba(255,255,255,0.005) 120px,
-        rgba(255,255,255,0.005) 121px
-      );
-  }
-
-  .rock-emoji {
-    font-size: clamp(4rem, 12vw, 8rem);
-    animation: boulder 3s ease-in-out infinite;
-    display: block;
-    margin-bottom: 1rem;
-    filter: drop-shadow(0 0 40px rgba(196,98,45,0.4));
-  }
-
-  @keyframes boulder {
-    0%, 100% { transform: rotate(-3deg) scale(1); }
-    50% { transform: rotate(3deg) scale(1.05); }
-  }
-
-  .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(4rem, 15vw, 12rem);
-    letter-spacing: 0.05em;
-    line-height: 0.9;
-    color: var(--chalk);
-    text-shadow: 
-      4px 4px 0 var(--ember),
-      8px 8px 0 rgba(196,98,45,0.3);
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-title span {
-    color: var(--fire);
-  }
-
-  .hero-sub {
-    font-family: 'VT323', monospace;
-    font-size: clamp(1.2rem, 4vw, 2rem);
-    color: var(--ash);
-    margin-top: 1.5rem;
-    letter-spacing: 0.1em;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-tagline {
-    font-size: clamp(0.75rem, 2vw, 1rem);
-    color: var(--ember);
-    margin-top: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    position: relative;
-    z-index: 1;
-  }
-
-  .badge-row {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .badge {
-    background: var(--rock);
-    border: 1px solid rgba(196,98,45,0.3);
-    color: var(--ash);
-    padding: 0.4rem 1rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .badge.hot {
-    background: rgba(196,98,45,0.15);
-    border-color: var(--ember);
-    color: var(--fire);
-  }
-
-  .cta-row {
-    display: flex;
-    gap: 1rem;
-    margin-top: 3rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .btn-primary {
-    background: var(--ember);
-    color: var(--cave);
-    padding: 1rem 2.5rem;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 0.15em;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.15s;
-    position: relative;
-  }
-
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 100%;
-    height: 100%;
-    border: 2px solid var(--ember);
-    transition: all 0.15s;
-  }
-
-  .btn-primary:hover {
-    background: var(--fire);
-    transform: translate(-2px, -2px);
-  }
-
-  .btn-primary:hover::after {
-    bottom: -6px;
-    right: -6px;
-  }
-
-  .btn-secondary {
-    border: 1px solid var(--ash);
-    color: var(--ash);
-    padding: 1rem 2.5rem;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 0.15em;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.15s;
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--bone);
-    color: var(--bone);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--ash);
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
-
-  /* SECTIONS */
-  section {
-    padding: 6rem 2rem;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .section-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--ember);
-    margin-bottom: 1rem;
-  }
-
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.5rem, 8vw, 5rem);
-    color: var(--chalk);
-    line-height: 1;
-    margin-bottom: 2rem;
-  }
-
-  /* GAP BLOCK */
-  .gap-section {
-    border-left: 3px solid var(--ember);
-    padding-left: 2rem;
-    background: linear-gradient(90deg, rgba(196,98,45,0.05) 0%, transparent 100%);
-    padding: 2rem 2rem 2rem 2.5rem;
-    margin: 2rem 0;
-  }
-
-  .gap-section p {
-    color: var(--bone);
-    line-height: 1.8;
-    font-size: 0.9rem;
-  }
-
-  .gap-section strong {
-    color: var(--fire);
-  }
-
-  /* COMPARISON */
-  .compare-grid {
-    display: grid;
-    gap: 1px;
-    background: rgba(196,98,45,0.2);
-    border: 1px solid rgba(196,98,45,0.2);
-    margin: 3rem 0;
-  }
-
-  .compare-row {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 1px;
-    background: rgba(196,98,45,0.2);
-  }
-
-  .compare-label {
-    background: var(--rock);
-    padding: 1.2rem;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 0.1em;
-    color: var(--ash);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .compare-label.active {
-    color: var(--fire);
-    background: rgba(196,98,45,0.1);
-  }
-
-  .compare-text {
-    background: var(--stone);
-    padding: 1.2rem 1.5rem;
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: var(--ash);
-  }
-
-  .compare-text.active {
-    color: var(--chalk);
-  }
-
-  .token-count {
-    display: inline-block;
-    background: rgba(196,98,45,0.15);
-    border: 1px solid rgba(196,98,45,0.3);
-    color: var(--fire);
-    padding: 0.1rem 0.5rem;
-    font-size: 0.75rem;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-  }
-
-  /* MODES */
-  .modes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1px;
-    background: rgba(196,98,45,0.15);
-    border: 1px solid rgba(196,98,45,0.15);
-    margin: 3rem 0;
-  }
-
-  .mode-card {
-    background: var(--stone);
-    padding: 2rem;
-    transition: background 0.2s;
-  }
-
-  .mode-card:hover {
-    background: var(--rock);
-  }
-
-  .mode-rocks {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .mode-command {
-    font-family: 'VT323', monospace;
-    font-size: 1.8rem;
-    color: var(--fire);
-    margin-bottom: 0.5rem;
-  }
-
-  .mode-reduction {
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--ember);
-    margin-bottom: 1rem;
-  }
-
-  .mode-desc {
-    font-size: 0.8rem;
-    color: var(--ash);
-    line-height: 1.6;
-  }
-
-  /* INSTALL */
-  .install-steps {
-    counter-reset: steps;
-    margin: 3rem 0;
-  }
-
-  .install-step {
-    counter-increment: steps;
-    display: grid;
-    grid-template-columns: 3rem 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
-    align-items: start;
-  }
-
-  .step-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    color: var(--ember);
-    line-height: 1;
-  }
-
-  .step-content h3 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    color: var(--chalk);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-  }
-
-  .step-content p {
-    font-size: 0.8rem;
-    color: var(--ash);
-    line-height: 1.7;
-  }
-
-  code, .code-block {
-    font-family: 'Space Mono', monospace;
-    background: var(--rock);
-    border: 1px solid rgba(196,98,45,0.2);
-    color: var(--fire);
-    padding: 0.15rem 0.5rem;
-    font-size: 0.85em;
-  }
-
-  .code-block {
-    display: block;
-    padding: 1rem 1.5rem;
-    margin: 0.75rem 0;
-    font-size: 0.85rem;
-    color: var(--chalk);
-    overflow-x: auto;
-  }
-
-  /* COMPAT */
-  .compat-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 2rem 0;
-  }
-
-  .compat-table th {
-    text-align: left;
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--ash);
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(196,98,45,0.2);
-  }
-
-  .compat-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
-    color: var(--bone);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .compat-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .yes { color: #6db86d; }
-  .no { color: var(--ash); }
-
-  /* FOOTER */
-  footer {
-    border-top: 1px solid rgba(196,98,45,0.15);
-    padding: 3rem 2rem;
-    text-align: center;
-    color: var(--ash);
-    font-size: 0.75rem;
-    line-height: 2;
-  }
-
-  footer a { color: var(--ember); text-decoration: none; }
-  footer a:hover { color: var(--fire); }
-
-  /* DIVIDER */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(196,98,45,0.3), transparent);
-    margin: 0 2rem;
-  }
-
-  /* science block */
-  .science-block {
-    background: var(--stone);
-    border: 1px solid rgba(196,98,45,0.2);
-    padding: 2rem;
-    margin: 2rem 0;
-  }
-
-  .science-stat {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 4rem;
-    color: var(--fire);
-    line-height: 1;
-  }
-
-  .science-label {
-    font-size: 0.75rem;
-    color: var(--ash);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 0.25rem;
-  }
-
-  .science-cite {
-    font-size: 0.75rem;
-    color: var(--ash);
-    margin-top: 1rem;
-    line-height: 1.6;
-  }
-
-  .science-cite a {
-    color: var(--ember);
-    text-decoration: none;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .compare-row { grid-template-columns: 80px 1fr; }
-    .mode-card { padding: 1.5rem; }
-    .install-step { grid-template-columns: 2rem 1fr; gap: 1rem; }
-  }
-</style>
-</head>
-<body>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="cave-wall"></div>
-  <span class="rock-emoji">🪨</span>
-  <h1 class="hero-title">CAVE<span>MAN</span><br>SKILL</h1>
-  <p class="hero-sub">why use many word when few word do trick</p>
-  <p class="hero-tagline">claude.ai edition · web & desktop · three modes</p>
-
-  <div class="badge-row">
-    <span class="badge hot">🔥 claude.ai exclusive</span>
-    <span class="badge">~87% token reduction</span>
-    <span class="badge">no terminal needed</span>
-    <span class="badge">MIT license</span>
-  </div>
-
-  <div class="cta-row">
-    <a href="https://github.com/3idhMind/caveman-skill/releases/download/v1.0.0/caveman-skill.skill" class="btn-primary">↓ Download Skill</a>
-    <a href="https://github.com/3idhMind/caveman-skill" class="btn-secondary">GitHub →</a>
-  </div>
-
-  <p class="scroll-hint">▼ scroll ▼</p>
-</div>
-
-<div class="divider"></div>
-
-<!-- THE GAP -->
-<section>
-  <p class="section-label">the problem</p>
-  <h2 class="section-title">CLAUDE CODE<br>≠ CLAUDE.AI</h2>
-
-  <div class="gap-section">
-    <p>
-      <strong>JuliusBrussee's caveman</strong> went viral — 26k+ stars, Hacker News #1, ThePrimeagen covered it. 
-      The idea is simple: make Claude talk like a caveman, cut 75% of output tokens, save money and time.
-    </p>
-    <br>
-    <p>
-      But it only works in <strong>Claude Code</strong> — the CLI developer tool. 
-      You need a terminal. You need Node. You need to run <code>npx skills add</code>.
-      Most people using Claude every day never touch a terminal.
-    </p>
-    <br>
-    <p>
-      <strong>Nobody built this for claude.ai.</strong> The web app. The desktop app. 
-      The one with 100 million users. Until now.
-    </p>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- COMPARE -->
-<section>
-  <p class="section-label">before / after</p>
-  <h2 class="section-title">SAME ANSWER.<br>LESS WORDS.</h2>
-
-  <div class="compare-grid">
-    <div class="compare-row">
-      <div class="compare-label">NORMAL</div>
-      <div class="compare-text">
-        Sure! I'd be happy to help you with that. The issue you're experiencing is most likely caused by your authentication middleware not properly validating the token expiry. Let me take a look and suggest a fix. Hope that helps!
-        <span class="token-count">72 tokens</span>
-      </div>
-    </div>
-    <div class="compare-row">
-      <div class="compare-label" style="color: #8ab88a;">LITE</div>
-      <div class="compare-text active">
-        The issue is in your authentication middleware — token expiry isn't being validated correctly. Fix:
-        <span class="token-count">38 tokens</span>
-      </div>
-    </div>
-    <div class="compare-row">
-      <div class="compare-label active">NORMAL</div>
-      <div class="compare-text active">
-        Auth middleware. Token expiry check wrong. Fix:
-        <span class="token-count">11 tokens</span>
-      </div>
-    </div>
-    <div class="compare-row">
-      <div class="compare-label" style="color: #e84c4c;">ULTRA</div>
-      <div class="compare-text active" style="color: #e8a0a0;">
-        <code>auth middleware. expiry &lt; not &lt;=.</code>
-        <span class="token-count">6 tokens</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- MODES -->
-<section>
-  <p class="section-label">three modes</p>
-  <h2 class="section-title">PICK YOUR<br>INTENSITY.</h2>
-
-  <div class="modes-grid">
-    <div class="mode-card">
-      <div class="mode-rocks">🪨</div>
-      <div class="mode-command">/caveman-lite</div>
-      <div class="mode-reduction">~30% reduction</div>
-      <p class="mode-desc">
-        Removes pleasantries, hedging, meta-commentary, sign-offs. Grammar stays intact. 
-        Good for people who want cleaner answers without going full cave.
-      </p>
-    </div>
-    <div class="mode-card">
-      <div class="mode-rocks">🪨🪨</div>
-      <div class="mode-command">/caveman</div>
-      <div class="mode-reduction">~75% reduction</div>
-      <p class="mode-desc">
-        Full caveman grammar. No articles. No filler. Fragments fine. 
-        Short synonyms. Maximum signal. This is the main mode.
-      </p>
-    </div>
-    <div class="mode-card">
-      <div class="mode-rocks">🪨🪨🪨</div>
-      <div class="mode-command">/caveman-ultra</div>
-      <div class="mode-reduction">~87% reduction</div>
-      <p class="mode-desc">
-        Absolute minimum. Symbols over words (→, =, +). 
-        Every word must earn its place. One fragment per point. Brutal compression.
-      </p>
-    </div>
-  </div>
-
-  <p style="font-size: 0.8rem; color: var(--ash); text-align: center; margin-top: 1rem;">
-    Switch anytime mid-conversation. <code>/normal</code> to return to default.
-  </p>
-</section>
-
-<div class="divider"></div>
-
-<!-- SCIENCE -->
-<section>
-  <p class="section-label">why it works</p>
-  <h2 class="section-title">BREVITY ≠<br>DUMB.</h2>
-
-  <div class="science-block">
-    <div class="science-stat">+26pp</div>
-    <div class="science-label">accuracy improvement under brevity constraints</div>
-    <p class="science-cite">
-      A March 2026 arXiv paper — <a href="https://arxiv.org/abs/2502.04463" target="_blank">"Brevity Constraints Reverse Performance Hierarchies in Language Models"</a> — found that forcing LLMs to produce brief responses improved accuracy by 26 percentage points on certain benchmarks. Verbose is not always better.
-    </p>
-  </div>
-
-  <p style="font-size: 0.9rem; color: var(--ash); line-height: 1.9; margin-top: 2rem;">
-    Claude is trained to be helpful, thorough, and pleasant. Great for human conversation. 
-    Expensive in tokens. Those pleasantries cost you money every session.
-    <br><br>
-    Caveman strips the wrapper. The logic stays identical. The bill drops.
-    <br><br>
-    <strong style="color: var(--bone);">Caveman not dumb. Caveman efficient. Caveman say what need saying. Then stop.</strong>
-  </p>
-</section>
-
-<div class="divider"></div>
-
-<!-- INSTALL -->
-<section>
-  <p class="section-label">get started</p>
-  <h2 class="section-title">INSTALL IN<br>60 SECONDS.</h2>
-  <p style="font-size: 0.8rem; color: var(--ash); margin-bottom: 2rem;">No terminal. No npm. No setup. Just download and upload.</p>
-
-  <div class="install-steps">
-    <div class="install-step">
-      <div class="step-num">01</div>
-      <div class="step-content">
-        <h3>Download the skill</h3>
-        <p>
-          Download <a href="https://github.com/3idhMind/caveman-skill/releases/download/v1.0.0/caveman-skill.skill" style="color: var(--ember);">caveman-skill.zip</a> from the latest GitHub release.
-          It's a small zip file — the skill definition.
-        </p>
-      </div>
-    </div>
-
-    <div class="install-step">
-      <div class="step-num">02</div>
-      <div class="step-content">
-        <h3>Open Claude Settings</h3>
-        <p>
-          Go to <a href="https://claude.ai" style="color: var(--ember);">claude.ai</a> in your browser (or open Claude Desktop app).
-          Navigate to: <code>Settings → Capabilities → Skills</code>
-        </p>
-      </div>
-    </div>
-
-    <div class="install-step">
-      <div class="step-num">03</div>
-      <div class="step-content">
-        <h3>Upload the zip file</h3>
-        <p>
-          Click <strong style="color: var(--bone);">"Upload skill"</strong> and select the <code>caveman-skill.zip</code> file you downloaded.
-          Claude installs it automatically.
-        </p>
-      </div>
-    </div>
-
-    <div class="install-step">
-      <div class="step-num">04</div>
-      <div class="step-content">
-        <h3>Use it</h3>
-        <p>In any conversation, type your activation command:</p>
-        <div class="code-block">/caveman</div>
-        <p>Claude responds: <code>🪨 caveman mode on.</code></p>
-        <p style="margin-top: 0.5rem;">To turn off: <code>/normal</code></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- COMPAT -->
-<section>
-  <p class="section-label">compatibility</p>
-  <h2 class="section-title">WHERE IT<br>WORKS.</h2>
-
-  <table class="compat-table">
-    <thead>
-      <tr>
-        <th>Platform</th>
-        <th>Works?</th>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>claude.ai (web browser)</td>
-        <td class="yes">✅ Yes</td>
-        <td style="color: var(--ash); font-size: 0.8rem;">Primary target</td>
-      </tr>
-      <tr>
-        <td>Claude Desktop (macOS)</td>
-        <td class="yes">✅ Yes</td>
-        <td style="color: var(--ash); font-size: 0.8rem;">Same upload flow</td>
-      </tr>
-      <tr>
-        <td>Claude Desktop (Windows)</td>
-        <td class="yes">✅ Yes</td>
-        <td style="color: var(--ash); font-size: 0.8rem;">Same upload flow</td>
-      </tr>
-      <tr>
-        <td>Claude Code (CLI)</td>
-        <td class="no">❌ No</td>
-        <td style="color: var(--ash); font-size: 0.8rem;">Use <a href="https://github.com/JuliusBrussee/caveman" style="color: var(--ember);">JuliusBrussee/caveman</a> instead</td>
-      </tr>
-      <tr>
-        <td>Claude API</td>
-        <td class="no">❌ No</td>
-        <td style="color: var(--ash); font-size: 0.8rem;">Add rules to system prompt directly</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<div class="divider"></div>
-
-<!-- FOOTER -->
-<footer>
-  <p style="font-size: 1.5rem; margin-bottom: 1rem;">🪨</p>
-  <p>Inspired by <a href="https://github.com/JuliusBrussee/caveman">JuliusBrussee/caveman</a> — the original that started it all.</p>
-  <p>This fills the gap: <strong>claude.ai and Claude Desktop users</strong> who want the same power without a terminal.</p>
-  <br>
-  <p>Built by <a href="https://3idhmind.in">3idhmind</a> · <a href="https://github.com/3idhMind/caveman-skill">GitHub</a> · MIT License</p>
-  <br>
-  <p style="color: rgba(138,125,114,0.5); font-size: 0.7rem;">🪨 caveman save token. token save money. money good.</p>
-</footer>
-
-<script>
-  // Subtle parallax on hero rock emoji
-  document.addEventListener('mousemove', (e) => {
-    const rock = document.querySelector('.rock-emoji');
-    const x = (e.clientX / window.innerWidth - 0.5) * 15;
-    const y = (e.clientY / window.innerHeight - 0.5) * 10;
-    rock.style.transform = `rotate(${x/3}deg) scale(1) translateX(${x}px) translateY(${y}px)`;
-  });
-
-  // Entrance animation
-  const observerOpts = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🪨 caveman-skill — claude.ai edition</title>
+    <meta
+      name="description"
+      content="The only caveman skill built for claude.ai. Three modes. Up to 87% token reduction. No terminal required."
+    />
+    <meta property="og:title" content="🪨 caveman-skill for claude.ai" />
+    <meta
+      property="og:description"
+      content="why use many word when few word do trick. Now for claude.ai web & desktop."
+    />
+    <meta property="og:image" content="og.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --stone: #1a1612;
+        --cave: #0f0d0b;
+        --rock: #2d2520;
+        --ember: #c4622d;
+        --fire: #e8873a;
+        --ash: #8a7d72;
+        --bone: #d4c5b0;
+        --chalk: #f0e8dc;
+        --moss: #4a5c3a;
       }
-    });
-  }, observerOpts);
 
-  document.querySelectorAll('section, .divider').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-  });
-</script>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-</body>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--cave);
+        color: var(--bone);
+        font-family: "Space Mono", monospace;
+        overflow-x: hidden;
+        cursor: default;
+      }
+
+      /* Grain overlay */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.4;
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 2rem;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 40% at 50% 80%,
+            rgba(196, 98, 45, 0.15) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 80% 60% at 50% 100%,
+            rgba(196, 98, 45, 0.08) 0%,
+            transparent 60%
+          );
+      }
+
+      /* Cave wall texture stripes */
+      .cave-wall {
+        position: absolute;
+        inset: 0;
+        background-image:
+          repeating-linear-gradient(
+            92deg,
+            transparent,
+            transparent 80px,
+            rgba(255, 255, 255, 0.008) 80px,
+            rgba(255, 255, 255, 0.008) 81px
+          ),
+          repeating-linear-gradient(
+            178deg,
+            transparent,
+            transparent 120px,
+            rgba(255, 255, 255, 0.005) 120px,
+            rgba(255, 255, 255, 0.005) 121px
+          );
+      }
+
+      .rock-emoji {
+        font-size: clamp(4rem, 12vw, 8rem);
+        animation: boulder 3s ease-in-out infinite;
+        display: block;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 40px rgba(196, 98, 45, 0.4));
+      }
+
+      @keyframes boulder {
+        0%,
+        100% {
+          transform: rotate(-3deg) scale(1);
+        }
+        50% {
+          transform: rotate(3deg) scale(1.05);
+        }
+      }
+
+      .hero-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(4rem, 15vw, 12rem);
+        letter-spacing: 0.05em;
+        line-height: 0.9;
+        color: var(--chalk);
+        text-shadow:
+          4px 4px 0 var(--ember),
+          8px 8px 0 rgba(196, 98, 45, 0.3);
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-title span {
+        color: var(--fire);
+      }
+
+      .hero-sub {
+        font-family: "VT323", monospace;
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        color: var(--ash);
+        margin-top: 1.5rem;
+        letter-spacing: 0.1em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-tagline {
+        font-size: clamp(0.75rem, 2vw, 1rem);
+        color: var(--ember);
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge-row {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge {
+        background: var(--rock);
+        border: 1px solid rgba(196, 98, 45, 0.3);
+        color: var(--ash);
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .badge.hot {
+        background: rgba(196, 98, 45, 0.15);
+        border-color: var(--ember);
+        color: var(--fire);
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .btn-primary {
+        background: var(--ember);
+        color: var(--cave);
+        padding: 1rem 2.5rem;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.4rem;
+        letter-spacing: 0.15em;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.15s;
+        position: relative;
+      }
+
+      .btn-primary::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--ember);
+        transition: all 0.15s;
+      }
+
+      .btn-primary:hover {
+        background: var(--fire);
+        transform: translate(-2px, -2px);
+      }
+
+      .btn-primary:hover::after {
+        bottom: -6px;
+        right: -6px;
+      }
+
+      .btn-secondary {
+        border: 1px solid var(--ash);
+        color: var(--ash);
+        padding: 1rem 2.5rem;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.4rem;
+        letter-spacing: 0.15em;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.15s;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--bone);
+        color: var(--bone);
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--ash);
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* SECTIONS */
+      section {
+        padding: 6rem 2rem;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .section-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: var(--ember);
+        margin-bottom: 1rem;
+      }
+
+      .section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(2.5rem, 8vw, 5rem);
+        color: var(--chalk);
+        line-height: 1;
+        margin-bottom: 2rem;
+      }
+
+      /* GAP BLOCK */
+      .gap-section {
+        border-left: 3px solid var(--ember);
+        padding-left: 2rem;
+        background: linear-gradient(
+          90deg,
+          rgba(196, 98, 45, 0.05) 0%,
+          transparent 100%
+        );
+        padding: 2rem 2rem 2rem 2.5rem;
+        margin: 2rem 0;
+      }
+
+      .gap-section p {
+        color: var(--bone);
+        line-height: 1.8;
+        font-size: 0.9rem;
+      }
+
+      .gap-section strong {
+        color: var(--fire);
+      }
+
+      /* COMPARISON */
+      .compare-grid {
+        display: grid;
+        gap: 1px;
+        background: rgba(196, 98, 45, 0.2);
+        border: 1px solid rgba(196, 98, 45, 0.2);
+        margin: 3rem 0;
+      }
+
+      .compare-row {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 1px;
+        background: rgba(196, 98, 45, 0.2);
+      }
+
+      .compare-label {
+        background: var(--rock);
+        padding: 1.2rem;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.1rem;
+        letter-spacing: 0.1em;
+        color: var(--ash);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .compare-label.active {
+        color: var(--fire);
+        background: rgba(196, 98, 45, 0.1);
+      }
+
+      .compare-text {
+        background: var(--stone);
+        padding: 1.2rem 1.5rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--ash);
+      }
+
+      .compare-text.active {
+        color: var(--chalk);
+      }
+
+      .token-count {
+        display: inline-block;
+        background: rgba(196, 98, 45, 0.15);
+        border: 1px solid rgba(196, 98, 45, 0.3);
+        color: var(--fire);
+        padding: 0.1rem 0.5rem;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+      }
+
+      /* MODES */
+      .modes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1px;
+        background: rgba(196, 98, 45, 0.15);
+        border: 1px solid rgba(196, 98, 45, 0.15);
+        margin: 3rem 0;
+      }
+
+      .mode-card {
+        background: var(--stone);
+        padding: 2rem;
+        transition: background 0.2s;
+      }
+
+      .mode-card:hover {
+        background: var(--rock);
+      }
+
+      .mode-rocks {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .mode-command {
+        font-family: "VT323", monospace;
+        font-size: 1.8rem;
+        color: var(--fire);
+        margin-bottom: 0.5rem;
+      }
+
+      .mode-reduction {
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--ember);
+        margin-bottom: 1rem;
+      }
+
+      .mode-desc {
+        font-size: 0.8rem;
+        color: var(--ash);
+        line-height: 1.6;
+      }
+
+      /* INSTALL */
+      .install-steps {
+        counter-reset: steps;
+        margin: 3rem 0;
+      }
+
+      .install-step {
+        counter-increment: steps;
+        display: grid;
+        grid-template-columns: 3rem 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+        align-items: start;
+      }
+
+      .step-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2rem;
+        color: var(--ember);
+        line-height: 1;
+      }
+
+      .step-content h3 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.4rem;
+        color: var(--chalk);
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+      }
+
+      .step-content p {
+        font-size: 0.8rem;
+        color: var(--ash);
+        line-height: 1.7;
+      }
+
+      code,
+      .code-block {
+        font-family: "Space Mono", monospace;
+        background: var(--rock);
+        border: 1px solid rgba(196, 98, 45, 0.2);
+        color: var(--fire);
+        padding: 0.15rem 0.5rem;
+        font-size: 0.85em;
+      }
+
+      .code-block {
+        display: block;
+        padding: 1rem 1.5rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+        color: var(--chalk);
+        overflow-x: auto;
+      }
+
+      /* COMPAT */
+      .compat-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+      }
+
+      .compat-table th {
+        text-align: left;
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--ash);
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(196, 98, 45, 0.2);
+      }
+
+      .compat-table td {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: var(--bone);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .compat-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .yes {
+        color: #6db86d;
+      }
+      .no {
+        color: var(--ash);
+      }
+
+      /* FOOTER */
+      footer {
+        border-top: 1px solid rgba(196, 98, 45, 0.15);
+        padding: 3rem 2rem;
+        text-align: center;
+        color: var(--ash);
+        font-size: 0.75rem;
+        line-height: 2;
+      }
+
+      footer a {
+        color: var(--ember);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--fire);
+      }
+
+      /* DIVIDER */
+      .divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(196, 98, 45, 0.3),
+          transparent
+        );
+        margin: 0 2rem;
+      }
+
+      /* science block */
+      .science-block {
+        background: var(--stone);
+        border: 1px solid rgba(196, 98, 45, 0.2);
+        padding: 2rem;
+        margin: 2rem 0;
+      }
+
+      .science-stat {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 4rem;
+        color: var(--fire);
+        line-height: 1;
+      }
+
+      .science-label {
+        font-size: 0.75rem;
+        color: var(--ash);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+      }
+
+      .science-cite {
+        font-size: 0.75rem;
+        color: var(--ash);
+        margin-top: 1rem;
+        line-height: 1.6;
+      }
+
+      .science-cite a {
+        color: var(--ember);
+        text-decoration: none;
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .compare-row {
+          grid-template-columns: 80px 1fr;
+        }
+        .mode-card {
+          padding: 1.5rem;
+        }
+        .install-step {
+          grid-template-columns: 2rem 1fr;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HERO -->
+    <div class="hero">
+      <div class="cave-wall"></div>
+      <span class="rock-emoji">🪨</span>
+      <h1 class="hero-title">CAVE<span>MAN</span><br />SKILL</h1>
+      <p class="hero-sub">why use many word when few word do trick</p>
+      <p class="hero-tagline">
+        claude.ai edition · web & desktop · three modes
+      </p>
+
+      <div class="badge-row">
+        <span class="badge hot">🔥 claude.ai exclusive</span>
+        <span class="badge">~87% token reduction</span>
+        <span class="badge">no terminal needed</span>
+        <span class="badge">MIT license</span>
+      </div>
+
+      <div class="cta-row">
+        <a
+          href="https://github.com/devvaham/caveman-skill/releases/download/v1.0.0/caveman-skill.skill"
+          class="btn-primary"
+          >↓ Download Skill</a
+        >
+        <a
+          href="https://github.com/devvaham/caveman-skill"
+          class="btn-secondary"
+          >GitHub →</a
+        >
+      </div>
+
+      <p class="scroll-hint">▼ scroll ▼</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- THE GAP -->
+    <section>
+      <p class="section-label">the problem</p>
+      <h2 class="section-title">CLAUDE CODE<br />≠ CLAUDE.AI</h2>
+
+      <div class="gap-section">
+        <p>
+          <strong>JuliusBrussee's caveman</strong> went viral — 26k+ stars,
+          Hacker News #1, ThePrimeagen covered it. The idea is simple: make
+          Claude talk like a caveman, cut 75% of output tokens, save money and
+          time.
+        </p>
+        <br />
+        <p>
+          But it only works in <strong>Claude Code</strong> — the CLI developer
+          tool. You need a terminal. You need Node. You need to run
+          <code>npx skills add</code>. Most people using Claude every day never
+          touch a terminal.
+        </p>
+        <br />
+        <p>
+          <strong>Nobody built this for claude.ai.</strong> The web app. The
+          desktop app. The one with 100 million users. Until now.
+        </p>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- COMPARE -->
+    <section>
+      <p class="section-label">before / after</p>
+      <h2 class="section-title">SAME ANSWER.<br />LESS WORDS.</h2>
+
+      <div class="compare-grid">
+        <div class="compare-row">
+          <div class="compare-label">NORMAL</div>
+          <div class="compare-text">
+            Sure! I'd be happy to help you with that. The issue you're
+            experiencing is most likely caused by your authentication middleware
+            not properly validating the token expiry. Let me take a look and
+            suggest a fix. Hope that helps!
+            <span class="token-count">72 tokens</span>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label" style="color: #8ab88a">LITE</div>
+          <div class="compare-text active">
+            The issue is in your authentication middleware — token expiry isn't
+            being validated correctly. Fix:
+            <span class="token-count">38 tokens</span>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label active">NORMAL</div>
+          <div class="compare-text active">
+            Auth middleware. Token expiry check wrong. Fix:
+            <span class="token-count">11 tokens</span>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label" style="color: #e84c4c">ULTRA</div>
+          <div class="compare-text active" style="color: #e8a0a0">
+            <code>auth middleware. expiry &lt; not &lt;=.</code>
+            <span class="token-count">6 tokens</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- MODES -->
+    <section>
+      <p class="section-label">three modes</p>
+      <h2 class="section-title">PICK YOUR<br />INTENSITY.</h2>
+
+      <div class="modes-grid">
+        <div class="mode-card">
+          <div class="mode-rocks">🪨</div>
+          <div class="mode-command">/caveman-lite</div>
+          <div class="mode-reduction">~30% reduction</div>
+          <p class="mode-desc">
+            Removes pleasantries, hedging, meta-commentary, sign-offs. Grammar
+            stays intact. Good for people who want cleaner answers without going
+            full cave.
+          </p>
+        </div>
+        <div class="mode-card">
+          <div class="mode-rocks">🪨🪨</div>
+          <div class="mode-command">/caveman</div>
+          <div class="mode-reduction">~75% reduction</div>
+          <p class="mode-desc">
+            Full caveman grammar. No articles. No filler. Fragments fine. Short
+            synonyms. Maximum signal. This is the main mode.
+          </p>
+        </div>
+        <div class="mode-card">
+          <div class="mode-rocks">🪨🪨🪨</div>
+          <div class="mode-command">/caveman-ultra</div>
+          <div class="mode-reduction">~87% reduction</div>
+          <p class="mode-desc">
+            Absolute minimum. Symbols over words (→, =, +). Every word must earn
+            its place. One fragment per point. Brutal compression.
+          </p>
+        </div>
+      </div>
+
+      <p
+        style="
+          font-size: 0.8rem;
+          color: var(--ash);
+          text-align: center;
+          margin-top: 1rem;
+        "
+      >
+        Switch anytime mid-conversation. <code>/normal</code> to return to
+        default.
+      </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SCIENCE -->
+    <section>
+      <p class="section-label">why it works</p>
+      <h2 class="section-title">BREVITY ≠<br />DUMB.</h2>
+
+      <div class="science-block">
+        <div class="science-stat">+26pp</div>
+        <div class="science-label">
+          accuracy improvement under brevity constraints
+        </div>
+        <p class="science-cite">
+          A March 2026 arXiv paper —
+          <a href="https://arxiv.org/abs/2502.04463" target="_blank"
+            >"Brevity Constraints Reverse Performance Hierarchies in Language
+            Models"</a
+          >
+          — found that forcing LLMs to produce brief responses improved accuracy
+          by 26 percentage points on certain benchmarks. Verbose is not always
+          better.
+        </p>
+      </div>
+
+      <p
+        style="
+          font-size: 0.9rem;
+          color: var(--ash);
+          line-height: 1.9;
+          margin-top: 2rem;
+        "
+      >
+        Claude is trained to be helpful, thorough, and pleasant. Great for human
+        conversation. Expensive in tokens. Those pleasantries cost you money
+        every session.
+        <br /><br />
+        Caveman strips the wrapper. The logic stays identical. The bill drops.
+        <br /><br />
+        <strong style="color: var(--bone)"
+          >Caveman not dumb. Caveman efficient. Caveman say what need saying.
+          Then stop.</strong
+        >
+      </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- INSTALL -->
+    <section>
+      <p class="section-label">get started</p>
+      <h2 class="section-title">INSTALL IN<br />60 SECONDS.</h2>
+      <p style="font-size: 0.8rem; color: var(--ash); margin-bottom: 2rem">
+        No terminal. No npm. No setup. Just download and upload.
+      </p>
+
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3>Download the skill</h3>
+            <p>
+              Download
+              <a
+                href="https://github.com/devvaham/caveman-skill/releases/download/v1.0.0/caveman-skill.skill"
+                style="color: var(--ember)"
+                >caveman-skill.zip</a
+              >
+              from the latest GitHub release. It's a small zip file — the skill
+              definition.
+            </p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3>Open Claude Settings</h3>
+            <p>
+              Go to
+              <a href="https://claude.ai" style="color: var(--ember)"
+                >claude.ai</a
+              >
+              in your browser (or open Claude Desktop app). Navigate to:
+              <code>Settings → Capabilities → Skills</code>
+            </p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3>Upload the zip file</h3>
+            <p>
+              Click
+              <strong style="color: var(--bone)">"Upload skill"</strong> and
+              select the <code>caveman-skill.zip</code> file you downloaded.
+              Claude installs it automatically.
+            </p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h3>Use it</h3>
+            <p>In any conversation, type your activation command:</p>
+            <div class="code-block">/caveman</div>
+            <p>Claude responds: <code>🪨 caveman mode on.</code></p>
+            <p style="margin-top: 0.5rem">To turn off: <code>/normal</code></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- COMPAT -->
+    <section>
+      <p class="section-label">compatibility</p>
+      <h2 class="section-title">WHERE IT<br />WORKS.</h2>
+
+      <table class="compat-table">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Works?</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>claude.ai (web browser)</td>
+            <td class="yes">✅ Yes</td>
+            <td style="color: var(--ash); font-size: 0.8rem">Primary target</td>
+          </tr>
+          <tr>
+            <td>Claude Desktop (macOS)</td>
+            <td class="yes">✅ Yes</td>
+            <td style="color: var(--ash); font-size: 0.8rem">
+              Same upload flow
+            </td>
+          </tr>
+          <tr>
+            <td>Claude Desktop (Windows)</td>
+            <td class="yes">✅ Yes</td>
+            <td style="color: var(--ash); font-size: 0.8rem">
+              Same upload flow
+            </td>
+          </tr>
+          <tr>
+            <td>Claude Code (CLI)</td>
+            <td class="no">❌ No</td>
+            <td style="color: var(--ash); font-size: 0.8rem">
+              Use
+              <a
+                href="https://github.com/JuliusBrussee/caveman"
+                style="color: var(--ember)"
+                >JuliusBrussee/caveman</a
+              >
+              instead
+            </td>
+          </tr>
+          <tr>
+            <td>Claude API</td>
+            <td class="no">❌ No</td>
+            <td style="color: var(--ash); font-size: 0.8rem">
+              Add rules to system prompt directly
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- FOOTER -->
+    <footer>
+      <p style="font-size: 1.5rem; margin-bottom: 1rem">🪨</p>
+      <p>
+        Inspired by
+        <a href="https://github.com/JuliusBrussee/caveman"
+          >JuliusBrussee/caveman</a
+        >
+        — the original that started it all.
+      </p>
+      <p>
+        This fills the gap:
+        <strong>claude.ai and Claude Desktop users</strong> who want the same
+        power without a terminal.
+      </p>
+      <br />
+      <p>
+        Built by <a href="https://github.com/devvaham">Dev Vaham</a> ·
+        <a href="https://github.com/devvaham/caveman-skill">GitHub</a> · MIT
+        License
+      </p>
+      <br />
+      <p style="color: rgba(138, 125, 114, 0.5); font-size: 0.7rem">
+        🪨 caveman save token. token save money. money good.
+      </p>
+    </footer>
+
+    <script>
+      // Subtle parallax on hero rock emoji
+      document.addEventListener("mousemove", (e) => {
+        const rock = document.querySelector(".rock-emoji");
+        const x = (e.clientX / window.innerWidth - 0.5) * 15;
+        const y = (e.clientY / window.innerHeight - 0.5) * 10;
+        rock.style.transform = `rotate(${x / 3}deg) scale(1) translateX(${x}px) translateY(${y}px)`;
+      });
+
+      // Entrance animation
+      const observerOpts = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+          }
+        });
+      }, observerOpts);
+
+      document.querySelectorAll("section, .divider").forEach((el) => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(30px)";
+        el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+        observer.observe(el);
+      });
+    </script>
+  </body>
 </html>

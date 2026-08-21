@@ -142,7 +142,7 @@ Less words ≠ less smart. Brevity constraints force signal over noise.
 
 ## About
 
-Built by **Dev Vaham** / [3idhMind](https://3idhmind.in) — an AI automation agency.
+Built by [@Dev Vaham](https://github.com/devvaham)
 Filling gaps in the AI tools ecosystem, one open source project at a time.
 
 > *"Caveman not dumb. Caveman efficient."*
